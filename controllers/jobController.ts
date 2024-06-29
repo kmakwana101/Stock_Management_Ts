@@ -11,12 +11,11 @@ import moment from "moment";
 import mongoose from "mongoose";
 import { PROFILE } from "../models/profileModel";
 
-export const addJob = async (req : Request, res : Response) => {
+export const addJob = async (req: Request, res: Response) => {
     try {
-
         const { pharmaNumber, date, assignToId, roleArray, patternArray } = req.body;
 
-        const formattedDate : any = moment(date, 'DD/MM/YYYY', true);
+        const formattedDate: any = moment(date, 'DD/MM/YYYY', true);
 
         switch (true) {
             case !pharmaNumber:
@@ -44,7 +43,7 @@ export const addJob = async (req : Request, res : Response) => {
             if (!findColor) throw new Error('please provide valid colorId.')
         }
 
-        const newJob : any = await JOB.create({
+        const newJob: any = await JOB.create({
             assignTo: assignToId ? assignToId : null,
             date: formattedDate.toDate('DD/MM/YYYY'),
             pharmaNumber: pharmaNumber,
@@ -108,7 +107,7 @@ export const addJob = async (req : Request, res : Response) => {
             data: response
         });
 
-    } catch (error : any) {
+    } catch (error: any) {
         res.status(400).json({
             status: "Failed",
             message: error.message,
@@ -116,7 +115,7 @@ export const addJob = async (req : Request, res : Response) => {
     }
 }
 
-export const getJobList = async (req : Request, res : Response) => {
+export const getJobList = async (req: Request, res: Response) => {
 
     try {
 
@@ -131,7 +130,7 @@ export const getJobList = async (req : Request, res : Response) => {
             query.assignTo = req.userId;
         }
         // { path: "userId", populate: { path: "role" } }
-        const jobList : any = await JOB.find({ ...query, isDeleted: false }).populate({
+        const jobList: any = await JOB.find({ ...query, isDeleted: false }).populate({
             path: "assignTo",
         })
 
@@ -141,19 +140,19 @@ export const getJobList = async (req : Request, res : Response) => {
             const patternArray = await JOB_PATTERN.find({ jobId: job._id }).populate('patternId')
             const processArray = await JOB_STATUS.find({ jobId: job._id }).populate('processId')
             let date = moment(job.date).format('DD/MM/YYYY')
-            
-            let assignTo : any;
-            if(job.assignTo){
-                const findProfile = await PROFILE.findOne({ userId : job.assignTo , isDeleted : false }).populate({
-                    path : "userId",
-                    select : "-password"
+
+            let assignTo: any;
+            if (job.assignTo) {
+                const findProfile = await PROFILE.findOne({ userId: job.assignTo, isDeleted: false }).populate({
+                    path: "userId",
+                    select: "-password"
                 })
                 assignTo = findProfile;
             }
 
             let obj = {
                 ...job._doc,
-                assignTo : assignTo ? assignTo : null,
+                assignTo: assignTo ? assignTo : null,
                 date: date,
                 patternArray: patternArray,
                 roleArray: roleArray,
@@ -169,7 +168,7 @@ export const getJobList = async (req : Request, res : Response) => {
             data: response
         });
 
-    } catch (error : any) {
+    } catch (error: any) {
         res.status(400).json({
             status: "Failed",
             message: error.message,
@@ -177,13 +176,13 @@ export const getJobList = async (req : Request, res : Response) => {
     }
 }
 
-export const updateJob = async (req : Request, res : Response) => {
+export const updateJob = async (req: Request, res: Response) => {
     try {
 
         const { pharmaNumber, date, assignToId, roleArray, patternArray } = req.body;
         const { jobId } = req.query;
 
-        const formattedDate : any = moment(date, 'DD/MM/YYYY', true);
+        const formattedDate: any = moment(date, 'DD/MM/YYYY', true);
 
         switch (true) {
             case !jobId:
@@ -216,7 +215,7 @@ export const updateJob = async (req : Request, res : Response) => {
             if (!findColor) throw new Error('please provide valid colorId.')
         }
 
-        const updatedJob : any = await JOB.findOneAndUpdate(
+        const updatedJob: any = await JOB.findOneAndUpdate(
             { _id: jobId },
             {
                 $set: {
@@ -288,7 +287,7 @@ export const updateJob = async (req : Request, res : Response) => {
             data: response
         });
 
-    } catch (error : any) {
+    } catch (error: any) {
         res.status(400).json({
             status: "Failed",
             message: error.message,
@@ -296,7 +295,7 @@ export const updateJob = async (req : Request, res : Response) => {
     }
 }
 
-export const deleteJob = async (req : Request, res : Response) => {
+export const deleteJob = async (req: Request, res: Response) => {
     try {
 
         const { jobId } = req.query;
@@ -306,7 +305,7 @@ export const deleteJob = async (req : Request, res : Response) => {
         let job = await JOB.findOne({ _id: jobId, isDeleted: false });
         if (!job) throw new Error('Job not found.')
 
-        const deletedJob : any = await JOB.findOneAndUpdate(
+        const deletedJob: any = await JOB.findOneAndUpdate(
             { _id: jobId },
             {
                 $set: {
@@ -332,7 +331,7 @@ export const deleteJob = async (req : Request, res : Response) => {
             status: 201,
             message: 'job delete successfully',
         });
-    } catch (error : any) {
+    } catch (error: any) {
         res.status(400).json({
             status: "Failed",
             message: error.message,
@@ -340,7 +339,7 @@ export const deleteJob = async (req : Request, res : Response) => {
     }
 }
 
-export const assignJob = async (req : Request, res : Response) => {
+export const assignJob = async (req: Request, res: Response) => {
     try {
 
         const { jobId, assignTo } = req.query;
@@ -365,7 +364,7 @@ export const assignJob = async (req : Request, res : Response) => {
             message: 'job assign successfully',
         });
 
-    } catch (error : any) {
+    } catch (error: any) {
         res.status(400).json({
             status: "Failed",
             message: error.message,
@@ -373,7 +372,7 @@ export const assignJob = async (req : Request, res : Response) => {
     }
 }
 
-export const jobProcessStatus = async (req : Request, res : Response) => {
+export const jobProcessStatus = async (req: Request, res: Response) => {
     try {
 
         const { jobId, processId } = req.body;
@@ -415,7 +414,7 @@ export const jobProcessStatus = async (req : Request, res : Response) => {
             data: newJobStatus
         });
 
-    } catch (error : any) {
+    } catch (error: any) {
         res.status(400).json({
             status: "Failed",
             message: error.message,
@@ -423,7 +422,7 @@ export const jobProcessStatus = async (req : Request, res : Response) => {
     }
 }
 
-export const completeJob = async (req : Request, res : Response) => {
+export const completeJob = async (req: Request, res: Response) => {
     try {
 
         const { jobId } = req.query;
@@ -432,9 +431,9 @@ export const completeJob = async (req : Request, res : Response) => {
         const findJob = await JOB.findOne({ _id: jobId, isDeleted: false });
         if (!findJob) throw new Error('job not found.')
 
-        let allCompletedJobProcess : any = await JOB_STATUS.find({ jobId: jobId, status: 'Complete' }).populate('processId')
+        let allCompletedJobProcess: any = await JOB_STATUS.find({ jobId: jobId, status: 'Complete' }).populate('processId')
 
-        let isPackagedComplete = allCompletedJobProcess.filter((process : any) => process.processId.name === 'packaging');
+        let isPackagedComplete = allCompletedJobProcess.filter((process: any) => process.processId.name === 'packaging');
 
         if (!isPackagedComplete.length) {
             throw new Error('The job does not have a completed packaging process.');
@@ -448,7 +447,7 @@ export const completeJob = async (req : Request, res : Response) => {
             message: 'job Complete successfully.',
         });
 
-    } catch (error : any) {
+    } catch (error: any) {
 
         res.status(400).json({
             status: "Failed",
